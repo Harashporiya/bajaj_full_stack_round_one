@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm install",
+  "startCommand": "npm start",
+  "envVars": [
+    {
+      "key": "NODE_ENV",
+      "value": "production"
+    },
+    {
+      "key": "USER_ID",
+      "generateValue": false
+    },
+    {
+      "key": "EMAIL_ID",
+      "generateValue": false
+    },
+    {
+      "key": "COLLEGE_ROLL_NUMBER",
+      "generateValue": false
+    }
+  ]
+}
