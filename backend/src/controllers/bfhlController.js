@@ -41,9 +41,9 @@ async function handleBfhl(req, res) {
     const summary = buildSummary(hierarchies);
 
     return res.status(200).json({
-      user_id: process.env.USER_ID || "harash_01012000",
-      email_id: process.env.EMAIL_ID || "harash@chitkara.edu.in",
-      college_roll_number: process.env.COLLEGE_ROLL_NUMBER || "2110990123",
+      user_id: process.env.USER_ID || "harashporiya_15112005",
+      email_id: process.env.EMAIL_ID || "harash1215.be23@chitkarauniversity.edu.in",
+      college_roll_number: process.env.COLLEGE_ROLL_NUMBER || "2311981215",
       hierarchies,
       invalid_entries: invalidEntries,
       duplicate_edges: duplicateEdges,
