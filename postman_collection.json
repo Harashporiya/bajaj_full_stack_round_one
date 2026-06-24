@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "Chitkara BFHL API",
+    "description": "Postman collection for the BFHL REST API — Graph Hierarchy Analyser",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/",
+        "description": "Verify the server is running"
+      }
+    },
+    {
+      "name": "01 — Simple Tree",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"A->B\", \"A->C\", \"B->D\"]\n}"
+        },
+        "description": "Basic tree: A is root, B and C are children of A, D is child of B. Expected depth=3."
+      }
+    },
+    {
+      "name": "02 — Duplicates Only",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"A->B\", \"A->B\", \"A->B\"]\n}"
+        },
+        "description": "A->B appears 3 times. First occurrence used; duplicate_edges=[\"A->B\"]."
+      }
+    },
+    {
+      "name": "03 — Cycle Detection",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"X->Y\", \"Y->Z\", \"Z->X\"]\n}"
+        },
+        "description": "X->Y->Z->X is a cycle. has_cycle=true, tree={}."
+      }
+    },
+    {
+      "name": "04 — Invalid Entries",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"hello\", \"1->2\", \"AB->C\", \"A-B\", \"A->\", \"A->A\", \"\"]\n}"
+        },
+        "description": "All entries are invalid. invalid_entries should list all of them, hierarchies=[]."
+      }
+    },
+    {
+      "name": "05 — Multi-Parent (First Wins)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"A->D\", \"B->D\"]\n}"
+        },
+        "description": "Both A and B claim D. A wins (first seen). B->D is silently ignored (NOT in duplicate_edges)."
+      }
+    },
+    {
+      "name": "06 — Multiple Components",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"A->B\", \"B->C\", \"X->Y\", \"Y->Z\"]\n}"
+        },
+        "description": "Two separate trees: A-B-C and X-Y-Z. Both depth=3. Lexicographically smaller root (A) is largest_tree_root."
+      }
+    },
+    {
+      "name": "07 — Mixed (Tree + Cycle + Invalid + Duplicate)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\n    \"A->B\",\n    \"A->C\",\n    \"B->D\",\n    \"X->Y\",\n    \"Y->Z\",\n    \"Z->X\",\n    \"hello\",\n    \"1->2\",\n    \"A->B\"\n  ]\n}"
+        },
+        "description": "Full mixed test: tree (A), cycle (X-Y-Z), invalid (hello, 1->2), duplicate (A->B)."
+      }
+    },
+    {
+      "name": "08 — Empty Data",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": []\n}"
+        },
+        "description": "Empty array input. All arrays should be empty, summary has zeros."
+      }
+    },
+    {
+      "name": "09 — Deep Chain",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"A->B\", \"B->C\", \"C->D\", \"D->E\", \"E->F\"]\n}"
+        },
+        "description": "Linear chain A-B-C-D-E-F. Depth=6. largest_tree_root=A."
+      }
+    },
+    {
+      "name": "10 — Whitespace Trimming",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/bfhl",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"data\": [\"  A->B  \", \" A->C\", \"B->D \"]\n}"
+        },
+        "description": "Edges with surrounding whitespace should still be valid after trimming."
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "description": "Change to your Render URL in production"
+    }
+  ]
+}
